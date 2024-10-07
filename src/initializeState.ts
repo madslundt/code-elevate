@@ -14,7 +14,7 @@ export const initializeState = async (editor: vscode.TextEditor, workspaceFolder
 	const fileName = path.basename(fullFilePath);
 	const fileExtension = fileName.substring(fileName.lastIndexOf('.'));
 
-	const content = await getFileContent(filePath, workspaceFolderPath);
+	const content = await getFileContent(fullFilePath, workspaceFolderPath);
 
 	return {
 		fileName: fileName.substring(0, fileName.lastIndexOf('.')),
