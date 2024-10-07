@@ -1,7 +1,7 @@
 import { IState } from '../types';
 import { replaceHandlebars } from '../utils';
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs/promises';
+import path from 'path';
 
 export class OutputService {
   generateOutputPath(outPathTemplate: string, state: IState): string {
@@ -12,9 +12,9 @@ export class OutputService {
     const directoryPath = path.dirname(outputPath);
 
     // Ensure the directory exists
-    await fs.promises.mkdir(directoryPath, { recursive: true });
+    await fs.mkdir(directoryPath, { recursive: true });
 
     // Write the output to the specified path
-    await fs.promises.writeFile(outputPath, result, 'utf8');
+    await fs.writeFile(outputPath, result, 'utf-8');
   }
 }

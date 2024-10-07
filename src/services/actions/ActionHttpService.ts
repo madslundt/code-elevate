@@ -5,7 +5,7 @@ import { replaceHandlebars } from '../../utils';
 
 export class ActionHttpService implements IActionService<IActionHttp> {
   private client: AxiosInstance;
-  private cookies: string[] = [];
+  private cookies: string | undefined;
 
   constructor() {
     this.client = axios.create();
@@ -14,7 +14,7 @@ export class ActionHttpService implements IActionService<IActionHttp> {
       (response: AxiosResponse) => {
         const setCookie = response.headers['set-cookie'];
         if (setCookie) {
-          this.cookies = setCookie;
+          this.cookies = setCookie.join('; ');
         }
         return response;
       },
@@ -36,7 +36,7 @@ export class ActionHttpService implements IActionService<IActionHttp> {
       data,
       headers: {
         ...headers,
-        Cookie: this.cookies.join('; '),
+        Cookie: this.cookies,
       },
     };
 

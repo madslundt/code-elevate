@@ -1,5 +1,5 @@
-import { IMessage, IState, IStep } from '../types';
-import { trimStart, trimEnd, getErrorMessage } from '../utils';
+import { IState, IStep } from '../types';
+import { getErrorMessage } from '../utils';
 import { ActionServiceFactory } from './actions';
 
 export class ConfigurationService {
