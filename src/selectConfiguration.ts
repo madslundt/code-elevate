@@ -13,6 +13,9 @@ export const selectConfiguration = async (state: IState): Promise<IStepConfigura
   if (stepConfigurations.length === 0) {
     throw new Error(`No applicable configurations found for the file type ${state.fileExtension}.`);
   }
+  if (stepConfigurations.length === 1) {
+    return stepConfigurations[0];
+  }
 
   const selection = await vscode.window.showQuickPick(
     stepConfigurations.map((config, index) => ({

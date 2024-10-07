@@ -21,15 +21,17 @@ export const processConfigurationSteps = async (
     ...initialState,
   };
 
+  const totalSteps = selectedConfig.steps.length;
+
   await vscode.window.withProgress({
     location: vscode.ProgressLocation.Notification,
     title: `Processing ${selectedConfig.name}`,
     cancellable: false,
   }, async (progress) => {
-    for (let i = 0; i < selectedConfig.steps.length; i++) {
-      const step = selectedConfig.steps[ i ];
+    for (let i = 0; i < totalSteps; i++) {
+      const step = selectedConfig.steps[i];
       progress.report({
-        increment: ((i + 1) / selectedConfig.steps.length) * 100,
+        increment: 100 / totalSteps,
         message: `${step.key} (${i + 1} of ${selectedConfig.steps.length})`,
       });
 
@@ -37,18 +39,21 @@ export const processConfigurationSteps = async (
         // Execute the step using ConfigurationService
         let response = await configurationService.executeStep(step, state);
 
+        state[step.key] = response;
+
         // Human-in-the-loop handling
-        if (step.humanInTheLoopAction) {
-          response = await handleHumanInTheLoop(
-            step,
-            state,
-            {
-              executeMessage: (messages) => configurationService.executeHumanInTheLoop(step, state, messages, step.humanInTheLoopAction?.bodyMessage),
-              executeFinalMessage: (messages) => configurationService.executeHumanInTheLoop(step, state, messages, step.humanInTheLoopAction?.bodyFinalMessage),
-              save: (state) => saveFile(step, state, outputService),
-            }
-          );
-        }
+        // TODO: WIP
+        // if (step.humanInTheLoopAction) {
+        //   response = await handleHumanInTheLoop(
+        //     step,
+        //     state,
+        //     {
+        //       executeMessage: (messages) => configurationService.executeHumanInTheLoop(step, state, messages, step.humanInTheLoopAction?.bodyMessage),
+        //       executeFinalMessage: (messages) => configurationService.executeHumanInTheLoop(step, state, messages, step.humanInTheLoopAction?.bodyFinalMessage),
+        //       save: (state) => saveFile(step, state, outputService),
+        //     }
+        //   );
+        // }
 
         // Trim Start and End if specified
         if (step.trimStart) {

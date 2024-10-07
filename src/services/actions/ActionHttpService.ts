@@ -25,10 +25,10 @@ export class ActionHttpService implements IActionService<IActionHttp> {
   }
 
   async execute(action: IActionHttp, state: IState): Promise<AxiosResponse> {
-    const url = replaceHandlebars(action.url, state);
-    const method = replaceHandlebars(action.method, state);
-    const headers = Object.fromEntries(Object.entries(action.headers).map(([key, value]) => [key, replaceHandlebars(value, state)]));
-    const data = Object.fromEntries(Object.entries(action.body).map(([key, value]) => [key, replaceHandlebars(value, state)]));
+    const url = replaceHandlebars(state, action.url);
+    const method = replaceHandlebars(state, action.method);
+    const headers = Object.fromEntries(Object.entries(action.headers).map(([key, value]) => [key, replaceHandlebars(state, value)]));
+    const data = Object.fromEntries(Object.entries(action.body).map(([key, value]) => [key, replaceHandlebars(state, value)]));
 
     const config: AxiosRequestConfig = {
       method,
