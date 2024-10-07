@@ -1,8 +1,15 @@
 import { handleHumanInTheLoop } from "./handleHumanInTheLoop";
 import { ConfigurationService, OutputService } from "./services";
-import { IStepConfiguration, IState } from "./types";
+import { IStepConfiguration, IState, IStep } from "./types";
 import vscode from 'vscode';
-import { getErrorMessage } from "./utils";
+import { getErrorMessage, trimEnd, trimStart } from "./utils";
+
+const saveFile = async (step: IStep, state: IState, outputService: OutputService) => {
+  if (step.out) {
+    const outputPath = outputService.generateOutputPath(step.out, state);
+    await outputService.saveOutputToFile(outputPath, state[step.key]);
+  }
+};
 
 export const processConfigurationSteps = async (
   selectedConfig: IStepConfiguration,
@@ -28,22 +35,33 @@ export const processConfigurationSteps = async (
 
       try {
         // Execute the step using ConfigurationService
-        state = await configurationService.executeStep(step, state);
+        let response = await configurationService.executeStep(step, state);
 
         // Human-in-the-loop handling
         if (step.humanInTheLoopAction) {
-          state = await handleHumanInTheLoop(
+          response = await handleHumanInTheLoop(
             step,
             state,
-            (messages) => configurationService.executeHumanInTheLoop(step, state, messages)
+            {
+              executeMessage: (messages) => configurationService.executeHumanInTheLoop(step, state, messages, step.humanInTheLoopAction?.bodyMessage),
+              executeFinalMessage: (messages) => configurationService.executeHumanInTheLoop(step, state, messages, step.humanInTheLoopAction?.bodyFinalMessage),
+              save: (state) => saveFile(step, state, outputService),
+            }
           );
         }
 
-        // Write output to file if specified
-        if (step.out) {
-          const outputPath = outputService.generateOutputPath(step.out, state);
-          await outputService.saveOutputToFile(outputPath, state[step.key]);
+        // Trim Start and End if specified
+        if (step.trimStart) {
+          response = trimStart(response, step.trimStart);
         }
+
+        if (step.trimEnd) {
+          response = trimEnd(response, step.trimEnd);
+        }
+
+        state[step.key] = response;
+
+        saveFile(step, state, outputService);
 
       } catch (error) {
         if (step.continueOnError) {

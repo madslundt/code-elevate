@@ -11,3 +11,8 @@ export interface IActionHttp extends IAction {
   body: Record<string, any>;
   headers: Record<string, string>;
 }
+
+export interface IHumanInTheLoopActionHttp extends IActionHttp {
+  bodyMessage: Record<string, string>;
+  bodyFinalMessage: Record<string, string>;
+}

@@ -1,9 +1,9 @@
-import { IActionHttp } from "./IAction";
+import { IActionHttp, IHumanInTheLoopActionHttp } from "./IAction";
 
 export interface IStep {
   key: string;
   action: IActionHttp;
-  humanInTheLoopAction?: IActionHttp;
+  humanInTheLoopAction?: IHumanInTheLoopActionHttp;
   continueOnError?: boolean;
   out?: string;
   trimStart?: string;

@@ -9,7 +9,7 @@ export class ConfigurationService {
     this.actionServiceFactory = actionServiceFactory;
   }
 
-  async executeStep(step: IStep, state: IState): Promise<IState> {
+  async executeStep(step: IStep, state: IState): Promise<any> {
     let result: string;
 
     // Execute the action using the appropriate Action Service
@@ -20,29 +20,20 @@ export class ConfigurationService {
       throw new Error(`Failed to execute action for step "${step.key}": ${getErrorMessage(error)}`);
     }
 
-    // Trim Start and End if specified
-    if (step.trimStart) {
-      result = trimStart(result, step.trimStart);
-    }
-
-    if (step.trimEnd) {
-      result = trimEnd(result, step.trimEnd);
-    }
-
-    // Save result to state
-    state[step.key] = result;
-
-    return state;
+    return result;
   }
 
-  async executeHumanInTheLoop(step: IStep, state: IState, messages: IMessage[]): Promise<string> {
+  async executeHumanInTheLoop(step: IStep, state: IState, chatHistory: string, body?: Record<string, string>): Promise<any> {
     let result: string;
 
     // Execute the action using the appropriate Action Service
     try {
-      const response = await this.actionServiceFactory.executeAction(step.humanInTheLoopAction!, {
+      const response = await this.actionServiceFactory.executeAction({
+        ...step.humanInTheLoopAction!,
+        body: body || step.humanInTheLoopAction?.body,
+      }, {
         ...state,
-        messages,
+        chatHistory,
     });
       result = response.data; // Extract the data from the response
     } catch (error) {

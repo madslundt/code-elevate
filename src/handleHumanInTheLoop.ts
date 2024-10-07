@@ -3,7 +3,15 @@ import * as vscode from 'vscode';
 import { IStep, IState, IMessage, HumanInTheLoopCommandMessage } from './types';
 import { openHumanInTheLoopPanel } from './humanInTheLoopPanel';
 
-export const handleHumanInTheLoop = async (step: IStep, state: IState, executeMessage: (messages: IMessage[]) => Promise<string>): Promise<IState> =>
+interface ICommands {
+  executeMessage: (messages: string) => Promise<string>;
+  executeFinalMessage: (messages: string) => Promise<string>;
+  save: (state: IState) => Promise<void>;
+}
+
+const getMessagesString = (messages: IMessage[]): string => messages.map((message) => `${message.role}: ${message.content}`).join('\n');
+
+export const handleHumanInTheLoop = async (step: IStep, state: IState, commands: ICommands): Promise<IState> =>
   new Promise((resolve) => {
     const panel = openHumanInTheLoopPanel(`Human In The Loop: ${step.key}`, vscode.ViewColumn.One);
 
@@ -23,30 +31,25 @@ export const handleHumanInTheLoop = async (step: IStep, state: IState, executeMe
             updateMessages(panel, messages);
 
             // Simulate a response for demonstration purposes
-            const aiMessage = await executeMessage(messages);
             messages.push({
               role: 'ai',
-              content: aiMessage,
+              content: await commands.executeMessage(getMessagesString(messages)),
             });
             updateMessages(panel, messages);
 
             break;
 
           case 'continue':
-            // When the user clicks continue, resolve with the updated state
-            const newMessage: IMessage = { role: 'user', content: `Based on the chat history please write the final answer to the original prompt:\n${step.action.body}` };
-            // Simulate a response for demonstration purposes
-            const response = await executeMessage([
-              ...messages,
-              newMessage,
-            ]);
-            state[step.key] = response;
+            state[step.key] = await commands.executeFinalMessage(getMessagesString(messages));
             resolve(state);
             panel.dispose();
             break;
 
           case 'save':
-            vscode.window.showInformationMessage('State saved successfully.');
+            await commands.save({
+              ...state,
+              [step.key]: await commands.executeFinalMessage(getMessagesString(messages)),
+            });
             break;
 
           case 'include':

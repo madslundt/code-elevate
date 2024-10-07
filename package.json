@@ -123,6 +123,14 @@
                               "type": "object",
                               "description": "Body of the HTTP request"
                             },
+                            "bodyMessages": {
+                              "type": "object",
+                              "description": "Body of the HTTP request during human in the loop"
+                            },
+                            "bodyFinalMessage": {
+                              "type": "object",
+                              "description": "Body of the HTTP request when exiting human in the loop"
+                            },
                             "headers": {
                               "type": "object",
                               "description": "Headers for the HTTP request",
