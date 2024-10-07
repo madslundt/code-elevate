@@ -21,5 +21,6 @@ export const initializeState = async (editor: vscode.TextEditor, workspaceFolder
 		fileExtension,
 		filePath,
 		content,
+		workspaceFolderPath: workspaceFolder.uri.fsPath,
 	};
 };
