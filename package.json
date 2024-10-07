@@ -1,0 +1,207 @@
+{
+  "name": "elevate-code",
+  "displayName": "Elevate Code",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "elevate-code.runFile",
+        "title": "Elevate Code: Elevate file"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Elevate Code Configuration",
+      "description": "Configuration for Elevate Code",
+      "properties": {
+        "elevateCode.configuration": {
+          "type": "object",
+          "properties": {
+            "stepConfigurations": {
+              "type": "array",
+              "description": "List of step configurations",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the step configuration"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Optional description of the step configuration"
+                  },
+                  "fileExtensions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Optional file extensions associated with this step configuration"
+                  },
+                  "steps": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "description": "A unique identifier for the step"
+                        },
+                        "action": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "http"
+                              ],
+                              "description": "The type of action"
+                            },
+                            "url": {
+                              "type": "string",
+                              "description": "URL to send the HTTP request"
+                            },
+                            "method": {
+                              "type": "string",
+                              "enum": [
+                                "POST",
+                                "GET"
+                              ],
+                              "description": "HTTP method to use"
+                            },
+                            "body": {
+                              "type": "object",
+                              "description": "Body of the HTTP request"
+                            },
+                            "headers": {
+                              "type": "object",
+                              "description": "Headers for the HTTP request",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "url",
+                            "method",
+                            "body",
+                            "headers"
+                          ]
+                        },
+                        "humanInTheLoopAction": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "http"
+                              ],
+                              "description": "The type of action"
+                            },
+                            "url": {
+                              "type": "string",
+                              "description": "URL to send the HTTP request"
+                            },
+                            "method": {
+                              "type": "string",
+                              "enum": [
+                                "POST",
+                                "GET"
+                              ],
+                              "description": "HTTP method to use"
+                            },
+                            "body": {
+                              "type": "object",
+                              "description": "Body of the HTTP request"
+                            },
+                            "headers": {
+                              "type": "object",
+                              "description": "Headers for the HTTP request",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "continueOnError": {
+                          "type": "boolean",
+                          "description": "Whether the step should continue on error"
+                        },
+                        "out": {
+                          "type": "string",
+                          "description": "Optional output string"
+                        },
+                        "trimStart": {
+                          "type": "string",
+                          "description": "Optional string to trim from the start"
+                        },
+                        "trimEnd": {
+                          "type": "string",
+                          "description": "Optional string to trim from the end"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "action"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "name",
+                  "steps"
+                ]
+              }
+            }
+          },
+          "default": {
+            "stepConfigurations": [
+              {
+                "name": "Default Step Configuration",
+                "steps": []
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "vscode": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.94.0",
+    "@types/mocha": "^10.0.8",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "eslint": "^9.11.1",
+    "typescript": "^5.6.2",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}
